@@ -1,6 +1,6 @@
 # Nuber-eats Frontend
 
-## 1. pre-installation
+## pre-installation
 
 ```
 npx create-react-app nuber-eats-frontend --template=typescript
@@ -83,10 +83,40 @@ import "./styles/styles.css";
 
 ```ts
 npm install @apollo/client graphql
-touch src/apollo.ts
-
-const client = new ApolloClient({
+// touch src/apollo.ts
+export const client = new ApolloClient({
   uri: "http://localhost:4000/graphql",
   cache: new InMemoryCache(),
 });
+
+// index.tsx
+import { ApolloProvider } from "@apollo/client";
+...
+<ApolloProvider client={client}>
+  <App />
+</ApolloProvider>
 ```
+
+- apollo client developer tools => can see docs
+- introspection query => get whole schema
+
+### Blueprint
+
+setup => auth => creatAccount forms => state management => user => testing frontend => restaurant owner dashboard => driver subscription => map => user pages
+
+### React Router Dom
+
+```
+npm install --save react-router-dom
+mkdir src/routers
+touch src/routers/logged-out-router.tsx
+touch src/routers/logged-in-router.tsx
+```
+
+> Thanks to JSX transform, we don't need to import React at each subcomponents
+
+- logged out
+- logged in
+- driver
+- customer
+- restaurant Owner

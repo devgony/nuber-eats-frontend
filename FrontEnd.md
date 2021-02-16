@@ -161,12 +161,19 @@ function App() {
 
 - but this is old way
 
-2. reactive variable
+2. `reactive variable` for local state
 
 ```ts
 // apollo.ts
 // define local state
 export const isLoggedInVar = makeVar(false);
+...
+isLoggedIn: {
+            read() {
+              return isLoggedInVar();
+            },
+          },
+...
 
 // logged-in-router.tsx
 // update local state
@@ -414,12 +421,21 @@ const [loginMutation, { data: loginMutationResult, loading }] = useMutation<
   loginMutation,
   loginMutationVariables
 >(LOGIN_MUTATION, { onCompleted, onError });
+// error for gql client not backend, like wrong url, request invalid
+```
+
+- by !loading, prevent duplicated login try
+
+```ts
+const onSubmit = () => {
+    if (!loading) {
+...
 ```
 
 ### how to clean files
 
 1.  `rf -rf`
-2.  rimraf
+2.  `rimraf`
 
 ```ts
 npm i rimraf
@@ -427,4 +443,227 @@ npm i rimraf
 // package.json
 "apollo:codegen": "rimraf src/__generated__ && apollo client:codegen src/__generated__ --target=typescript --outputFlat",
 "start": "npm run apollo:codegen & npm run tailwind:build & react-scripts start",
+```
+
+## UI Cloning
+
+```
+mkdir src/images
+download to src/images/logo.svg
+```
+
+- media query eg) for large screen: `lg:mt-28`
+- mobile(smaller) first always
+- extra palette
+
+```ts
+// tailwind.config.js
+const colors = require("tailwindcss/colors");
+
+module.exports = {
+  purge: [],
+  darkMode: false, // or 'media' or 'class'
+  theme: {
+    extend: {
+      colors: {
+        lime: colors.lime,
+      },
+    },
+```
+
+- disable state for button
+
+  - use `formState.isValid`
+  - `mode: onChange`: whenever it changes, check to validate, `onBlur`: focus and out (default mode of formState is `onSubmit`)
+  - create Button component
+
+  ```ts
+  // touch src/components/button.tsx
+  interface IButtonProps {
+    canClick: boolean;
+    loading: boolean;
+    actionText: string;
+  }
+
+  export const Button: React.FC<IButtonProps> = ({
+    canClick,
+    loading,
+    actionText,
+  }) => (
+    <button
+      className={`text-lg font-medium focus:outline-none text-white py-4  transition-colors; ${
+        canClick
+          ? "bg-lime-600 hover:bg-lime-700"
+          : "bg-gray-300 pointer-events-none"
+      }`}
+    >
+      {loading ? "Loading..." : actionText}
+    </button>
+  );
+  ```
+
+## React helmet - create account
+
+```
+npm i react-helmet
+npm i --save-dev @types/react-helmet
+```
+
+- change title with Helmet
+
+```ts
+// login.tsx
+<Helmet>
+  <title>Login | Nuber Eats</title>
+</Helmet>
+```
+
+## CreateAccount
+
+- $createAccountInput gets even UserRole from backend
+- onCompleted => useHistory to redirect to login
+- email regexp from http://emailregex.com/
+
+## Token
+
+### Token to reactive var
+
+```ts
+// apollo.ts
+const token = localStorage.getItem(LOCALSTORAGE_TOKEN);
+export const isLoggedInVar = makeVar(Boolean(token)); // flase
+export const authToken = makeVar(token); // null
+```
+
+### Save token
+
+```ts
+// login.tsx
+localStorage.setItem(LOCALSTORAGE_TOKEN, token); // save to localStorage
+authToken(token); // save to localState by Reactive Variable
+```
+
+### For constancy
+
+```ts
+//touch src/constants.ts
+export const LOCALSTORAGE_TOKEN = "nuber-token";
+```
+
+### Handle helmet warning
+
+```ts
+npm i react-helmet-async
+
+// login.tsx, create-account.tsx
+import Helmet from "react-helmet"; => import { Helmet } from "react-helmet-async";
+
+// index.tsx
+<HelmetProvider>
+        <App />
+</HelmetProvider>
+```
+
+### Send Token
+
+```ts
+import { setContext } from "@apollo/client/link/context";
+
+const httpLink = createHttpLink({
+  uri: "http://localhost:4000/graphql",
+});
+
+const authLink = setContext((_, { headers }) => {
+  return {
+    headers: {
+      ...headers,
+      "x-jwt": authTokenVar() || "",
+    },
+  };
+});
+...
+  link: authLink.concat(httpLink),
+...
+```
+
+## Routers and 404s
+
+```
+mkdir src/pages/client
+touch src/pages/client/restaurants.tsx
+touch src/pages/client/404.tsx
+```
+
+- `404NotFound`: when logged out, wront route shows error, Link to '/'
+  - put NotFound at the end of Router of logged-out-route.tsx
+- `Route` in Switch should not be with fragment <></>, instead, use []
+- `Redirect`: if there is no no route, go to~ (can use specific `from`)
+
+## Header
+
+```
+touch src/components/header.tsx
+```
+
+- `py-4` means vertical padding 1rem
+
+### font awesome
+
+- https://fontawesome.com/icons?d=gallery
+
+```ts
+npm i --save @fortawesome/fontawesome-svg-core
+npm install --save @fortawesome/free-solid-svg-icons
+npm install --save @fortawesome/react-fontawesome
+
+// header.tsx
+<FontAwesomeIcon icon={faUser} className="text-xl" />
+```
+
+## Repeated Hooks intead of props
+
+- if child is too deep, how to pass props? => create hook and call Repeatedly => from 2nd, it gets from cache not api
+
+```ts
+mkdir src/hooks
+// touch src/hooks/useMe.tsx
+const ME_QUERY = gql`
+  query meQuery {
+    me {
+      id
+      email
+      role
+      verified
+    }
+  }
+`;
+
+export const useMe = () => {
+  return useQuery<meQuery>(ME_QUERY);
+};
+
+// header.tsx
+const { data } = useMe();
+```
+
+### Redirect => NotFound is better
+
+### Give key={1} to each Route to remove error
+
+## Veryfy Email
+
+- how to convert 127.0.0.1 => localhost?
+  http://localhost:3000/confirm?code=3d134846-4d69-4652-ab96-628febd121a4
+
+```ts
+mkdir src/pages/user/
+// touch src/pages/user/confirm-email.tsx
+...
+const [_, code] = window.location.href.split("code=");
+...
+
+// logged-in-router.tsx
+<Route key={2} path="/confirm" exact>
+  <ConfirmEmail />
+</Route>,
 ```

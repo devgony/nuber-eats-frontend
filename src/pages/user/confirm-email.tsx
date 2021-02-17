@@ -1,5 +1,8 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { data } from "autoprefixer";
 import { useEffect } from "react";
+import { useHistory } from "react-router-dom";
+import { useMe } from "../../hooks/useMe";
 import {
   verifyEmail,
   verifyEmailVariables,
@@ -15,21 +18,45 @@ const VERIFY_EMAIL_MUTATION = gql`
 `;
 
 export const ConfirmEmail = () => {
-  const [verifyEmail, { loading: verifyingEmail }] = useMutation<
-    verifyEmail,
-    verifyEmailVariables
-  >(VERIFY_EMAIL_MUTATION);
+  const history = useHistory();
+  const { data: userData, refetch } = useMe();
+  const client = useApolloClient();
+  const onCompleted = (data: verifyEmail) => {
+    const {
+      verifyEmail: { ok },
+    } = data;
+    if (ok && userData?.me.id) {
+      client.writeFragment({
+        id: `User:${userData.me.id}`,
+        fragment: gql`
+          fragment VerifiedUser on User {
+            verified
+          }
+        `,
+        data: {
+          verified: true,
+        },
+      });
+      history.push("/");
+    }
+  };
+  const [verifyEmail] = useMutation<verifyEmail, verifyEmailVariables>(
+    VERIFY_EMAIL_MUTATION,
+    {
+      onCompleted,
+    }
+  );
   useEffect(() => {
     const [_, code] = window.location.href.split("code=");
     console.log(`code:: ${code}`);
-    // verifyEmail({
-    //   variables: {
-    //     input: {
-    //       code,
-    //     },
-    //   },
-    // });
-  }, []);
+    verifyEmail({
+      variables: {
+        input: {
+          code,
+        },
+      },
+    });
+  }, [verifyEmail]);
   return (
     <div className="mt-52 flex flex-col items-center justify-center">
       <h2 className="text-lg mb-1 font-medium">Confirming email...</h2>

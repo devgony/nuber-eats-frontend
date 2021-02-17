@@ -10,6 +10,7 @@ import { Header } from "../components/header";
 import { useMe } from "../hooks/useMe";
 import { NotFound } from "../pages/client/404";
 import { ConfirmEmail } from "../pages/user/confirm-email";
+import { EditProfile } from "../pages/edit-profile";
 
 // Route should not be with fragment <></>, instead, use []
 const ClientRoutes = [
@@ -19,6 +20,9 @@ const ClientRoutes = [
   <Route key={2} path="/confirm" exact>
     <ConfirmEmail />
   </Route>,
+   <Route key={3} path="/edit-profile" exact>
+   <EditProfile />
+ </Route>,
 ];
 
 export const LoggedInRouter = () => {

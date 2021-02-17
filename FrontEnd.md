@@ -24,6 +24,8 @@ npm install tailwindcss
 npm i postcss autoprefixer
 ```
 
+> VSCode Extension > Tailwind CSS IntelliSense
+
 1. touch postcss.config.js
 
 ```ts
@@ -667,3 +669,78 @@ const [_, code] = window.location.href.split("code=");
   <ConfirmEmail />
 </Route>,
 ```
+
+## Write to cache - writeFragment
+
+- Fragment is part of type(whole module)
+- need `id` to find
+- `fragment anyName on Type { keyToModify }`
+
+```ts
+// confirm-email.tsx
+const { data: userData } = useMe();
+const client = useApolloClient();
+const onCompleted = (data: verifyEmail) => {
+  const {
+    verifyEmail: { ok },
+  } = data;
+  if (ok && userData?.me.id) {
+    client.writeFragment({
+      id: `User:${userData.me.id}`,
+      fragment: gql`
+        fragment VerifiedUser on User {
+          verified
+        }
+      `,
+      data: {
+        verified: true,
+      },
+    });
+  }
+};
+```
+
+## Edit Profile
+
+```
+touch src/pages/edit-profile.tsx
+```
+
+- To edit profile, we edit a few => type should be nullable => handle null at backend => save works for only edited data
+- Don't use empty pw, it should be null!
+
+```ts
+input: {
+          email,
+          ...(password !== "" && { password }),
+        },
+```
+
+> ### writeFragment vs Refetch
+
+- Right after edit email, verified should be false
+
+#### writeFragment
+
+- Manually edit cache with `writeFragment` right after updating backend
+
+  => Fater performance
+
+#### Refetch
+
+- Safer than `writeFragment` but slower especially if front and backend is separated
+
+```ts
+const { data: userData, refetch } = useMe();
+...
+    await refetch();
+```
+
+## Restaurant
+
+- RESTAURANTS_QUERY needs input: page
+- tailwind!
+
+### Search bar
+
+- if user enter, send him to there? => use `form` instead of `div`

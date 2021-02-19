@@ -8,7 +8,7 @@ import { LOCALSTORAGE_TOKEN } from "./constants";
 import { setContext } from "@apollo/client/link/context";
 
 const token = localStorage.getItem(LOCALSTORAGE_TOKEN);
-export const isLoggedInVar = makeVar(Boolean(token)); // flase
+export const isLoggedInVar = makeVar(Boolean(token)); // false
 export const authTokenVar = makeVar(token); // null
 
 const httpLink = createHttpLink({

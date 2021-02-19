@@ -744,3 +744,184 @@ const { data: userData, refetch } = useMe();
 ### Search bar
 
 - if user enter, send him to there? => use `form` instead of `div`
+
+### coverImg with url
+
+### Group hover
+
+- `group-hover` groups other elems, assign target by `group`
+
+````ts
+<div className="flex flex-col group items-center cursor-pointer">
+  <div className="w-16 h-16 bg-cover group-hover:bg-gray-100 rounded-full">
+                  ```
+````
+
+> ### Handling by padding is way better than measuring size
+
+- tailwind gap => gap-x-5 gap-y-10
+
+### if frontend gets null? => suspect eager: true
+
+### Create component
+
+```
+> touch src/components/restaurant.tsx
+```
+
+#### Way to separate component - write ugly code first, think and clean later
+
+1. Write skeleton of interface and component
+2. Copy previous code to new component
+3. According to shown error, assign interface
+
+## Pagenation
+
+- page state will call query again as soon as it changes
+- if want to align page arrows(&rarr;) at all cases, create empty `div`
+
+## Search
+
+- when gives interface to useFrom, set the name of refered elem equal to variable name of interface
+
+1. send to /search
+
+```ts
+const onSerachSubmit = () => {
+  const { searchTerm } = getValues();
+  history.push({
+    pathname: "/search",
+    search: `term=${searchTerm}`,
+  });
+};
+```
+
+- push `state` instead of `search` when don't want to put term on url
+
+2. create search page
+
+```ts
+> touch src/pages/client/search.tsx
+```
+
+3. Handle Search exceptions
+
+- what if user delete term at url?
+
+  - => redirect to "/"
+  - history.replace: don't show at history api => don't need to save wrong page
+
+- > create common fragments
+
+```ts
+//> touch src/fragments.ts
+export const RESTAURANT_FRAGMENT = gql`
+  fragment RestaurantParts on Restaurant {
+    id
+    name
+    coverImg
+    category {
+      name
+    }
+    address
+    isPromoted
+  }
+`;
+
+// search.tsx
+const SEARCH_RESTAURANT = gql`
+  query searchRestaurant($input: SearchRestaurantInput!) {
+    searchRestaurant(input: $input) {
+      ok
+      error
+      totalPages
+      totalResults
+      restaurants {
+        ...RestaurantParts
+      }
+    }
+  }
+  ${RESTAURANT_FRAGMENT}
+`;
+
+// apollo.config.js
+    includes: ["./src/**/*.{tsx,ts}"],
+```
+
+- Lazy Query:
+  - query is basically called when pages loaded
+  - `Lazy Query` will be triggered when it's specifically called like `Mutation`
+  ```ts
+  const [callQuery, { loading, data, called }] = useLazyQuery<
+    searchRestaurant,
+    searchRestaurantVariables
+  >(SEARCH_RESTAURANT);
+  ```
+
+## Category
+
+- create page
+
+```
+> touch src/pages/client/category.tsx
+```
+
+- how to get variable at Route
+
+```ts
+// restaurants.tsx
+<Link to={`/category/${category.slug}`}>
+...
+
+// logged-in-router.tsx
+<Route key={5} path="/category/:slug" exact>
+```
+
+- useLocation VS useParams
+
+  - useLocation: can get search? query
+  - useParams: better to get Params
+
+    - useParams returns empty obj => create custom type with interface
+
+    ```ts
+    interface ICategoryParams {
+      slug: string;
+    }
+
+    export const Category = () => {
+      const params = useParams<ICategoryParams>();
+    ```
+
+- create another fragment `CategoryParts`
+- handle key warning => give the key to the top parent element
+- totalResults: null?
+
+## Code Challenge - create search and category page
+
+## Restaurant Detail
+
+```
+> touch src/pages/client/restaurant.tsx
+```
+
+- create restaurant page
+- onClick from restaurants => Restaurant Detail
+- do vertical size by padding (py) for bg-div, hy for elems
+
+## Testing React Components
+
+### jest setup
+
+- no ejection?
+
+```
+"jest": {
+  "collectCoverageFrom": [
+    "./src/components/**/*.tsx"
+    "./src/pages/**/*.tsx"
+    "./src/routers/**/*.tsx"
+  ]
+}
+npm test -- --coverage --watchAll=false
+```

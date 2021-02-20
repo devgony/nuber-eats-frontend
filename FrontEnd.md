@@ -916,12 +916,196 @@ const SEARCH_RESTAURANT = gql`
 - no ejection?
 
 ```
+// package.json
+"test:coverage": "npm test -- --coverage --watchAll=false"
+...
 "jest": {
   "collectCoverageFrom": [
-    "./src/components/**/*.tsx"
-    "./src/pages/**/*.tsx"
+    "./src/components/**/*.tsx",
+    "./src/pages/**/*.tsx",
     "./src/routers/**/*.tsx"
   ]
 }
-npm test -- --coverage --watchAll=false
+
+mv src/App.tsx src/components/app.tsx
+rm src/App.test.tsx
 ```
+
+### Test component from the point of User view
+
+```ts
+mkdir src/components/__tests__/
+touch src/components/__tests__/app.spec.tsx
+
+import { render } from "@testing-library/react";
+```
+
+### ApolloProvider error? => mock each Router by jest.mock
+
+### Login error? => use reactive variable covered by waitFor
+
+- when we change the state: need to waitFor
+
+```ts
+import { render, waitFor } from "@testing-library/react";
+import { isLoggedInVar } from "../../apollo";
+import { App } from "../app";
+
+jest.mock("../../routers/logged-out-router", () => {
+  return {
+    LoggedOutRouter: () => <span>logged-out</span>,
+  };
+});
+jest.mock("../../routers/logged-in-router", () => {
+  return {
+    LoggedInRouter: () => <span>logged-in</span>,
+  };
+});
+
+describe("<Appl />", () => {
+  it("renders LoggedOutRouter", () => {
+    const { getByText } = render(<App />);
+    getByText("logged-out");
+  });
+  it("renders LoggedInRouter", async () => {
+    const { getByText } = render(<App />);
+    await waitFor(() => {
+      isLoggedInVar(true);
+    });
+    getByText("logged-in");
+  });
+});
+```
+
+### button test
+
+```
+touch src/components/__tests__/button.spec.tsx
+
+// package.json
+    "test": "react-scripts test --verbose",
+```
+
+#### Test only output for user not the implementation of code => there can be some lines we can't test 100%
+
+#### conditional ? => rerender
+
+```ts
+describe("<Button />", () => {
+  it("should render OK with props", () => {
+    const { debug, getByText, rerender } = render(
+      <Button canClick={true} loading={false} actionText={"test"} />
+    );
+    getByText("test");
+    debug();
+    rerender(<Button canClick={true} loading={true} actionText={"test"} />);
+    debug();
+    getByText("Loading...");
+  });
+});
+```
+
+#### But better to separate than rerender
+
+#### Use container to test child's class
+
+```ts
+expect(container.firstChild).toHaveClass("pointer-events-none");
+```
+
+### FormError
+
+```
+touch src/components/__tests__/form-error.spec.tsx
+```
+
+### Restaurant
+
+```
+touch src/components/__tests__/restaurant.spec.tsx
+```
+
+#### if component is enclosed by Router, mock as well
+
+#### Link => anchor is the first element => use container
+
+```ts
+expect(container.firstChild).toHaveAttribute("href", "/restaurant/1");
+```
+
+#### props as a variable => more robust
+
+### header
+
+```
+touch src/components/__tests__/header.spec.tsx
+```
+
+#### Apollo MockedProvider => Mock gql request not the hook
+
+1. import MockedProvider
+2. mocks quest and result
+3. Promise setTimeout for request
+4. waitFor the changed state
+
+```js
+it("renders verify banner", async () => {
+  await waitFor(async () => {
+    const { getByText } = render(
+      <MockedProvider
+        mocks={[
+          {
+            request: {
+              query: ME_QUERY,
+            },
+            result: {
+              data: {
+                me: {
+                  id: 1,
+                  email: "",
+                  role: "",
+                  verified: false,
+                },
+              },
+            },
+          },
+        ]}
+      >
+        <Router>
+          <Header />
+        </Router>
+      </MockedProvider>
+    );
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    getByText("Please verify your email.");
+  });
+});
+```
+
+#### getByText will fail if it can't find => queryBytext is going to return null
+
+```ts
+expect(queryByText("Please verify your email.")).toBeNull;
+```
+
+### 404.tsx
+
+```
+touch src/components/__tests__/404.spec.tsx
+```
+
+#### Test title by Helmet
+
+```ts
+await waitFor(() => {
+  expect(document.title).toBe("Not Found | Nuber Eats");
+});
+```
+
+### login.tsx
+
+```
+touch src/components/__tests__/login.spec.tsx
+```
+
+#### Testinng Mutation with MockProvider can not be inspected as a function

@@ -1,4 +1,4 @@
-import { NotFound } from "../../pages/client/404";
+import { NotFound } from "../../pages/404";
 import { render, waitFor } from "../../test-utils";
 
 describe("<NotFound />", () => {

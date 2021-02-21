@@ -593,7 +593,7 @@ const authLink = setContext((_, { headers }) => {
 ```
 mkdir src/pages/client
 touch src/pages/client/restaurants.tsx
-touch src/pages/client/404.tsx
+touch src/pages/404.tsx
 ```
 
 - `404NotFound`: when logged out, wront route shows error, Link to '/'
@@ -703,7 +703,7 @@ const onCompleted = (data: verifyEmail) => {
 ## Edit Profile
 
 ```
-touch src/pages/edit-profile.tsx
+touch src/pages/user/edit-profile.tsx
 ```
 
 - To edit profile, we edit a few => type should be nullable => handle null at backend => save works for only edited data
@@ -1229,4 +1229,56 @@ import { render, RenderResult, waitFor } from "../../test-utils";
 
 #### window.alert error => spyOn
 
-### Mocking hooks!
+### Mocking hooks (library) !
+
+```ts
+const mockPush = jest.fn();
+
+jest.mock("react-router-dom", () => {
+  const realModule = jest.requireActual("react-router-dom");
+  return {
+    ...realModule,
+    useHistory: () => {
+      return {
+        push: mockPush,
+      };
+    },
+  };
+});
+...
+    expect(mockPush).toHaveBeenCalledWith("/");
+...
+afterAll(() => {
+    jest.clearAllMocks();
+});
+```
+
+## E2E Test
+
+### install Cypress - window, mac, linux
+
+```ts
+npm i cypress
+rm -rf cypress/integration/examples
+// touch cypress/tsconfig.json
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "baseUrl": "../node_modules",
+    "types": ["cypress"],
+    "outDir": "#"
+  },
+  "include": ["./**/*.*"]
+}
+
+// touch cypress/integration/first-test.ts
+describe("First Test", () => {
+  it("should go to homepage", () => {
+    cy.visit("http://localhost:3000")
+      .title()
+      .should("eq", "Login | Nuber Eats");
+  });
+});
+
+npx cypress open
+```

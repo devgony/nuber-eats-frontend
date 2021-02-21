@@ -11,7 +11,7 @@ import {
   createAccountMutationVariables,
 } from "../__generated__/createAccountMutation";
 
-const CREATE_ACCOUNT_MUTATION = gql`
+export const CREATE_ACCOUNT_MUTATION = gql`
   mutation createAccountMutation($createAccountInput: CreateAccountInput!) {
     createAccount(input: $createAccountInput) {
       ok
@@ -93,6 +93,9 @@ export const CreateAccount = () => {
           />
           {errors.email?.message && (
             <FormError errorMessage={errors.email?.message} />
+          )}
+          {errors.email?.type === "pattern" && (
+            <FormError errorMessage={"Please enter a valid email"} />
           )}
           <input
             ref={register({ required: "Password is required", minLength: 4 })}

@@ -1108,4 +1108,86 @@ await waitFor(() => {
 touch src/components/__tests__/login.spec.tsx
 ```
 
-#### Testinng Mutation with MockProvider can not be inspected as a function
+#### Testinng Mutation with MockProvider can not be inspected as a function (input validation, the number of mutation...) => `Mock Apollo Client`
+
+```
+npm install --save-dev mock-apollo-client
+```
+
+#### Set Helmet, Router
+
+#### useForm change state => enclose with `waitFor`
+
+- Warning: An update to Login inside a test was not wrapped in act(...).
+
+#### repetitive => use `beforeEach` and get `RenderResult`
+
+#### use `getByRole` to get `errorMessage`
+
+1. set role
+
+```ts
+// form-error.tsx
+  <span role="alert" className="font-medium text-red-500">
+
+// button.tsx
+<button
+    role="button"
+```
+
+2. getByRole
+
+```ts
+let errorMessage = getByRole("alert");
+const submitBtn = getByRole("button");
+```
+
+#### Test Mutation?
+
+1. share variable `mockedClient`
+
+```ts
+let mockedClient: MockApolloClient;
+mockedClient = createMockClient();
+```
+
+2. send request
+
+```ts
+const mockedMutationResponse = jest.fn().mockResolvedValue({
+  data: {
+    login: {
+      ok: true,
+      token: "XXX",
+      error: null,
+    },
+  },
+});
+mockedClient.setRequestHandler(LOGIN_MUTATION, mockedMutationResponse);
+```
+
+#### hard to test - function inside of component: Implementation
+
+```ts
+const onSubmit = () => {
+  if (!loading) {
+    const { email, password } = getValues();
+    loginMutation({
+      variables: {
+        loginInput: {
+          email,
+          password,
+        },
+      },
+    });
+  }
+};
+```
+
+#### Summary => hard of #18.7 Login Tests part Three
+
+### create-account.tsx
+
+```
+touch src/components/__tests__/create-account.spec.tsx
+```

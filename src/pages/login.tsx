@@ -12,7 +12,7 @@ import {
 import { authTokenVar, isLoggedInVar } from "../apollo";
 import { LOCALSTORAGE_TOKEN } from "../constants";
 
-const LOGIN_MUTATION = gql`
+export const LOGIN_MUTATION = gql`
   mutation loginMutation($loginInput: LoginInput!) {
     login(input: $loginInput) {
       ok
@@ -94,7 +94,7 @@ export const Login = () => {
             <FormError errorMessage={"Please enter a valid email"} />
           )}
           <input
-            ref={register({ required: "Password is required", minLength: 4 })}
+            ref={register({ required: "Password is required" })}
             required
             name="password"
             type="password"
@@ -104,9 +104,9 @@ export const Login = () => {
           {errors.password?.message && (
             <FormError errorMessage={errors.password?.message} />
           )}
-          {errors.password?.type === "minLength" && (
+          {/* {errors.password?.type === "minLength" && (
             <FormError errorMessage="Password must be more than 4 chars." />
-          )}
+          )} */}
           {/* <button className={`btn ${!formState.isValid ? "bg-gray-300" : ""}`}>
             {loading ? "Loading..." : "Log In"}
           </button> */}

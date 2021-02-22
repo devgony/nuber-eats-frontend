@@ -1282,3 +1282,95 @@ describe("First Test", () => {
 
 npx cypress open
 ```
+
+### cypress - better to use findByPlaceholderText
+
+```ts
+npm i @testing-library/cypress --save-dev
+
+// tsconfig.json
+"types": ["cypress","@testing-library/cypress"],
+
+// command.js
+import "@testing-library/cypress/add-commands";
+
+// first-test.ts
+// convert get to easier findByPlaceholderText
+.get('[name="email"]') => cy.findByPlaceholderText(/email/i)
+  // lasted cypress doesn't work with chaining command
+
+```
+
+### create account
+
+```
+> mkdir cypress/integration/auth
+> mv cypress/integration/first-test.ts cypress/integration/auth/login.ts
+> touch cypress/integration/auth/create-account.ts
+```
+
+#### Check local storage
+
+```ts
+user.window().its("localStorage.nuber-token").should("be.a", "string");
+```
+
+#### Wait for 1s to create account
+
+```ts
+user.wait(1000); // 1s
+```
+
+#### Create account only once?
+
+```ts
+user.intercept("http://localhost:4000/graphql", (req) => {
+  const { operationName } = req.body;
+  if (operationName && operationName === "createAccountMutation") {
+    req.reply((res) => {
+      res.send({
+        data: {
+          createAccount: {
+            ok: true,
+            error: null,
+            __typename: "CreateAccountOuput",
+          },
+        },
+      });
+    });
+  }
+});
+```
+
+#### Custom commands
+
+```ts
+> mv cypress/support/index.js cypress/support/index.ts
+> mv cypress/support/commands.js cypress/support/commands.ts
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      assertLoggedIn(): void;
+      assertLoggedOut(): void;
+      login(email: string, password: string): void;
+    }
+  }
+}
+
+Cypress.Commands.add("assertLoggedIn", () => {
+  cy.window().its("localStorage.nuber-token").should("be.a", "string");
+});
+...
+
+// create-account.ts
+...
+  // @ts-ignore
+      user.assertLoggedIn();
+```
+
+### Edit-profile
+
+```
+mkdir cypress/integration/user
+touch cypress/integration/user/edit-profile.tsx
+```

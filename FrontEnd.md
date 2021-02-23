@@ -1409,5 +1409,57 @@ res.send({
 
 ### Routes
 
+```
 mkdir src/pages/owner
 touch src/pages/owner/my-restaurants.tsx
+```
+
+#### add Query myRestaurants and myRestaurants to backend
+
+#### Clean code with array.map
+
+```js
+const commonRoutes = [
+  {
+    path: "/confirm",
+    component: <ConfirmEmail />,
+  },
+  {
+    path: "/edit-profile",
+    component: <EditProfile />,
+  },
+];
+{
+  commonRoutes.map((route) => (
+    <Route exact key={route.path} path={route.path}>
+      {route.component}
+    </Route>
+  ));
+}
+```
+
+- what about exact?
+
+### Create Restaurant
+
+```
+> touch src/pages/owner/add-restaurants.tsx
+```
+
+#### Capsulate with tailwind.css
+
+```ts
+.link {
+  @apply text-lime-600 hover:underline;
+}
+
+.container {
+  @apply max-w-screen-2xl mx-auto mt-32;
+}
+```
+
+#### Build tailwind manually
+
+```
+npm run tailwind:build
+```

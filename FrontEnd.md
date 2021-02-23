@@ -1370,7 +1370,44 @@ Cypress.Commands.add("assertLoggedIn", () => {
 
 ### Edit-profile
 
-```
+```ts
 mkdir cypress/integration/user
 touch cypress/integration/user/edit-profile.tsx
+
+user.intercept("POST", "http://localhost:4000/graphql", (req) => {
+      if (req.body?.operationName === "editProfile") {
+        // @ts-ignore
+        req.body?.variables?.input?.eamil = "real2@mail.com";
+      }
+});
 ```
+
+#### fixture - save intercept data
+
+```ts
+rm cypress/fixtures/example.json
+mkdir cypress/fixtures/auth
+
+// touch cypress/fixtures/auth/create-account.json
+{
+  "data": {
+    "createAccount": {
+      "ok": true,
+      "error": null,
+      "__typename": "CreateAccountOuput"
+    }
+  }
+}
+
+// create-account.ts
+res.send({
+            fixture: "auth/create-account.json",
+          });
+```
+
+## Order Dashboard
+
+### Routes
+
+mkdir src/pages/owner
+touch src/pages/owner/my-restaurants.tsx

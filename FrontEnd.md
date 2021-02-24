@@ -1463,3 +1463,9 @@ const commonRoutes = [
 ```
 npm run tailwind:build
 ```
+
+### Add Upload image module to backend
+File upload of NestJS - Multer
+stay in house => no extra library
+
+### Get image url

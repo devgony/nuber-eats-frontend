@@ -1,8 +1,14 @@
 import { gql, useMutation } from "@apollo/client";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { Button } from "../../components/button";
+import {
+  createDish,
+  createDishVariables,
+} from "../../__generated__/createDish";
+import { MY_RESTAURANT_QUERY } from "./my-restaurant";
 
 const CREATE_DISH_MUTATION = gql`
   mutation createDish($input: CreateDishInput!) {
@@ -15,21 +21,69 @@ const CREATE_DISH_MUTATION = gql`
 
 interface IForm {
   name: string;
-  price: number;
+  price: string;
   description: string;
+  [key: string]: string;
 }
 
 export const AddDish = () => {
   const { restaurantId } = useParams<{ restaurantId: string }>();
-  const [createDishMutation, { loading }] = useMutation(CREATE_DISH_MUTATION, {
-    //   refetchQueries: [{query: MY}]
+  const history = useHistory();
+  const [createDishMutation, { loading }] = useMutation<
+    createDish,
+    createDishVariables
+  >(CREATE_DISH_MUTATION, {
+    refetchQueries: [
+      {
+        query: MY_RESTAURANT_QUERY,
+        variables: {
+          input: {
+            id: +restaurantId,
+          },
+        },
+      },
+    ],
   });
-  const { register, handleSubmit, formState, getValues } = useForm<IForm>({
+  const {
+    register,
+    handleSubmit,
+    formState,
+    getValues,
+    setValue,
+  } = useForm<IForm>({
     mode: "onChange",
   });
   const onSubmit = () => {
-    const {} = getValues();
+    const { name, price, description, ...rest } = getValues();
+    const optionObjects = optionsNumber.map((theId) => ({
+      name: rest[`${theId}-optionName`],
+      exata: +rest[`${theId}-optionExtra`],
+    }));
+    createDishMutation({
+      variables: {
+        input: {
+          name,
+          price: +price,
+          description,
+          restaurantId: +restaurantId,
+          options: optionObjects,
+        },
+      },
+    });
+    history.goBack();
   };
+  const [optionsNumber, setOptionsNumber] = useState<number[]>([]);
+  const onAddOptionClick = () => {
+    setOptionsNumber((current) => [Date.now(), ...current]);
+  };
+  const onDeleteClick = (idToDelete: number) => {
+    setOptionsNumber((current) => current.filter((id) => id !== idToDelete));
+    setValue(`${idToDelete}-optionName`, "");
+    setValue(`${idToDelete}-optionExtra`, "");
+  };
+  useEffect(() => {
+    console.log(getValues());
+  });
   return (
     <div className="container flex flex-col items-center mt-52">
       <Helmet>
@@ -62,6 +116,41 @@ export const AddDish = () => {
           placeholder="Description"
           ref={register({ required: "Description is required." })}
         />
+        <div className="my-10">
+          <h4 className="font-medium mb-3 text-lg">Dish Options</h4>
+          <span
+            onClick={onAddOptionClick}
+            className="cursor-pointer text-white bg-gray-900 py-1 px-2 mt-5"
+          >
+            Add Dish Option
+          </span>
+          {optionsNumber.length !== 0 &&
+            optionsNumber.map((id) => (
+              <div key={id} className="mt-5">
+                <input
+                  ref={register}
+                  name={`${id}-optionName`}
+                  className="py-2 px-4 focus:outline-none mr-3 focus:border-gray-600 border-2"
+                  type="text"
+                  placeholder="Option Name"
+                />
+                <input
+                  ref={register}
+                  name={`${id}-optionExtra`}
+                  className="py-2 px-4 focus:outline-none focus:border-gray-600 border-2"
+                  type="number"
+                  min={0}
+                  placeholder="Option Extra"
+                />
+                <span
+                  className="curosr-pointer textg-white bg-red-500 ml-3 py-3 px-4 mt-5"
+                  onClick={() => onDeleteClick(id)}
+                >
+                  Delete Option
+                </span>
+              </div>
+            ))}
+        </div>
         <Button
           loading={loading}
           canClick={formState.isValid}

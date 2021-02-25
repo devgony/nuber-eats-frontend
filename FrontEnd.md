@@ -1496,3 +1496,55 @@ stay in house => no extra library
 ```ts
 const params = useParams<{ restaurantId: string }>();
 ```
+
+#### Try new way: refetchQuries
+
+- also support sending variables
+
+```ts
+refetchQueries: [
+      {
+        query: MY_RESTAURANT_QUERY,
+        variables: {
+          input: {
+            id: +restaurantId,
+          },
+        },
+      },
+    ],
+```
+
+#### Dynamic options
+
+##### Add option => Use unique name with Date.now() and create array => Array.map to create optionForm => Can be deleted by filter
+
+```ts
+{
+  optionsNumber.length !== 0 &&
+    optionsNumber.map((id) => (
+      <div key={id} className="mt-5">
+        <input
+          ref={register}
+          name={`${id}-optionName`}
+          className="py-2 px-4 focus:outline-none mr-3 focus:border-gray-600 border-2"
+          type="text"
+          placeholder="Option Name"
+        />
+        <input
+          ref={register}
+          name={`${id}-optionExtra`}
+          className="py-2 px-4 focus:outline-none focus:border-gray-600 border-2"
+          type="number"
+          min={0}
+          placeholder="Option Extra"
+        />
+        <span
+          className="curosr-pointer textg-white bg-red-500 ml-3 py-3 px-4 mt-5"
+          onClick={() => onDeleteClick(id)}
+        >
+          Delete Option
+        </span>
+      </div>
+    ));
+}
+```

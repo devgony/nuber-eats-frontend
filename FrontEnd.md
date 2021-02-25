@@ -1465,7 +1465,34 @@ npm run tailwind:build
 ```
 
 ### Add Upload image module to backend
+
 File upload of NestJS - Multer
 stay in house => no extra library
 
 ### Get image url
+
+- Get data from form => append to formBody => fetch POST to http://localhost:4000/uploads/
+- createRestaurantMutation
+
+### Optimize query
+
+- `writeQuery` to cache instead of `refetchQueries`
+- createRestaurant => getRestaurantID => fake created restaurant and add
+- share imageUrl with state
+  `const [imageUrl, setImageUrl] = useState("")`
+- touch API only once
+
+### My restaurant detail page
+
+```
+> touch src/pages/owner/my-restaurant.tsx
+> touch src/pages/owner/add-dish.tsx
+```
+
+#### Create `Dish Fragment` => for `my-restaurant.tsx`
+
+### Can use interface anonymously
+
+```ts
+const params = useParams<{ restaurantId: string }>();
+```

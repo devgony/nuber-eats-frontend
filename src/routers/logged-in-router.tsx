@@ -16,6 +16,8 @@ import { Category } from "../pages/client/category";
 import { Restaurant } from "../pages/client/restaurant";
 import { MyRestaurants } from "../pages/owner/my-restaurants";
 import { AddRestaurant } from "../pages/owner/add-restaurants";
+import { MyRestaurant } from "../pages/owner/my-restaurant";
+import { AddDish } from "../pages/owner/add-dish";
 
 // Route should not be with fragment <></>, instead, use []
 // const ClientRoutes = [
@@ -72,6 +74,8 @@ const commonRoutes = [
 const restaurantRoutes = [
   { path: "/", component: <MyRestaurants /> },
   { path: "/add-restaurant", component: <AddRestaurant /> },
+  { path: "/restaurant/:id", component: <MyRestaurant /> },
+  { path: "/restaurant/:id/add-dish", component: <AddDish /> },
 ];
 
 export const LoggedInRouter = () => {

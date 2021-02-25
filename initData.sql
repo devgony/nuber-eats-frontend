@@ -45,3 +45,22 @@ insert into restaurant (id, name, "coverImg", address, "categoryId", "ownerId") 
 insert into restaurant (id, name, "coverImg", address, "categoryId", "ownerId") values(28, 'Amber India Restaurant - SF', 'https://cn-geo1.uber.com/image-proc/resize/eats/format=webp/width=550/height=440/quality=70/srcb64=aHR0cHM6Ly9kMXJhbHNvZ25qbmczNy5jbG91ZGZyb250Lm5ldC84ZTQzOGIyZC02MDU5LTRmN2ItOTExNi03M2VmZjg0YWNmOTg=', 'korea', 13, 11);
 insert into restaurant (id, name, "coverImg", address, "categoryId", "ownerId") values(29, 'Kitava', 'https://cn-geo1.uber.com/image-proc/resize/eats/format=webp/width=550/height=440/quality=70/srcb64=aHR0cHM6Ly9kdXl0NGg5bmZuajUwLmNsb3VkZnJvbnQubmV0L3Jlc2l6ZWQvY2ZlZjkxZTc2YTRiNmRjNTdjMTU0OGUyM2VmZTZkNWUtdzU1MC1kNy5qcGc=', 'korea', 14, 11);
 insert into restaurant (id, name, "coverImg", address, "categoryId", "ownerId") values(30, 'Taqueria Los Coyotes', 'https://cn-geo1.uber.com/image-proc/resize/eats/format=webp/width=550/height=440/quality=70/srcb64=aHR0cHM6Ly9kdXl0NGg5bmZuajUwLmNsb3VkZnJvbnQubmV0L3Jlc2l6ZWQvMTUyOTA4NDYwNjQyMy13NTUwLTg0LmpwZw==', 'korea', 15, 11);
+
+SELECT 
+'union all select  '''||relname||''' as sequnce_name, last_value
+,(select max(id) from "'||replace(relname, '_id_seq', '')||'") as max_id
+from '||relname
+FROM pg_class c WHERE c.relkind = 'S';
+
+select  'user_id_seq' as sequnce_name, last_value ,(select max(id) from "user") as max_id from user_id_seq
+union all select  'verification_id_seq' as sequnce_name, last_value ,(select max(id) from "verification") as max_id from verification_id_seq
+union all select  'dish_id_seq' as sequnce_name, last_value ,(select max(id) from "dish") as max_id from dish_id_seq
+union all select  'payment_id_seq' as sequnce_name, last_value ,(select max(id) from "payment") as max_id from payment_id_seq
+union all select  'order_item_id_seq' as sequnce_name, last_value ,(select max(id) from "order_item") as max_id from order_item_id_seq
+union all select  'order_id_seq' as sequnce_name, last_value ,(select max(id) from "order") as max_id from order_id_seq
+union all select  'category_id_seq' as sequnce_name, last_value ,(select max(id) from "category") as max_id from category_id_seq
+union all select  'restaurant_id_seq' as sequnce_name, last_value ,(select max(id) from "restaurant") as max_id from restaurant_id_seq
+
+select nextval('restaurant_id_seq') => 30
+select nextval('user_id_seq') => 11
+select nextval('category_id_seq') => 15

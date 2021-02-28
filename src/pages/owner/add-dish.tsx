@@ -57,7 +57,7 @@ export const AddDish = () => {
     const { name, price, description, ...rest } = getValues();
     const optionObjects = optionsNumber.map((theId) => ({
       name: rest[`${theId}-optionName`],
-      exata: +rest[`${theId}-optionExtra`],
+      extra: +rest[`${theId}-optionExtra`],
     }));
     createDishMutation({
       variables: {
@@ -143,7 +143,7 @@ export const AddDish = () => {
                   placeholder="Option Extra"
                 />
                 <span
-                  className="curosr-pointer textg-white bg-red-500 ml-3 py-3 px-4 mt-5"
+                  className="cursor-pointer text-white bg-red-500 ml-3 py-3 px-4 mt-5"
                   onClick={() => onDeleteClick(id)}
                 >
                   Delete Option

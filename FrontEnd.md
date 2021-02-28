@@ -1518,6 +1518,8 @@ refetchQueries: [
 
 ##### Add option => Use unique name with Date.now() and create array => Array.map to create optionForm => Can be deleted by filter
 
+##### Do we really need setValue?
+
 ```ts
 {
   optionsNumber.length !== 0 &&
@@ -1539,7 +1541,7 @@ refetchQueries: [
           placeholder="Option Extra"
         />
         <span
-          className="curosr-pointer textg-white bg-red-500 ml-3 py-3 px-4 mt-5"
+          className="cursor-pointer text-white bg-red-500 ml-3 py-3 px-4 mt-5"
           onClick={() => onDeleteClick(id)}
         >
           Delete Option
@@ -1547,4 +1549,48 @@ refetchQueries: [
       </div>
     ));
 }
+```
+
+### Dish component
+
+```
+> touch src/components/dish.tsx
+```
+
+#### Homework: add edit dish
+
+### Chart Dashboard
+
+#### Victory
+
+```
+npm install victory
+```
+
+- VictoryChart
+- VictoryLine
+- VictoryAxis
+
+## Payment
+
+## Making an Order
+
+### Extending the Dish Component
+
+#### If client && options exists => render
+
+#### root Route should be `path: "/"` not `path: ""`
+
+#### Homework: dish choices
+
+### Making Order
+
+- Render dishOptions
+- Click `StartOrder`
+- Click each dish => push to state and bold-border
+- Or Click again to delete
+- Send isSelected props with function not state (data is already in `orderItems` state)
+
+```ts
+              isSelected={isSelected(dish.id)}
 ```

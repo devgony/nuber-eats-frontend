@@ -43,7 +43,7 @@ import { AddDish } from "../pages/owner/add-dish";
 
 const clientRoutes = [
   {
-    path: "",
+    path: "/",
     component: <Restaurants />,
   },
   {

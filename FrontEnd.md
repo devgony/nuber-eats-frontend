@@ -1594,3 +1594,117 @@ npm install victory
 ```ts
               isSelected={isSelected(dish.id)}
 ```
+
+#### addOptionToItem
+
+- if dishId was selected before, 0. save oldItem temporary
+
+  1. without option? => remove dishId from order and set again with options
+  2. with option? => remove dishId anyway and set again with options but keep old options as well.
+  3. use pre-defined `children` react node not to push down property any more
+
+- Ignore typescript warning with `!` => don't use frequently
+
+```ts
+        { dishId, options: [option, ...oldItem.options!] },
+```
+
+#### Separate dish-option
+
+```
+> touch src/components/dish-option.tsx
+```
+
+#### removeOptionFromItem
+
+1. if dish is not selected? => doesn't work
+2. get oldItem
+3. remove old Id, set Id again with filtered option, keep current other dishes
+
+#### createOrderMutation
+
+- useMutation
+- oncompleted => push to /orders/${orderId}
+- add: return orderId at backend of `create-order.dto.ts`
+- choices should be optional
+
+```ts
+// orders.service.ts
+const dishOptionChoice = dishOption.choices?.find(
+  ...
+```
+
+## Realtime Order
+
+- everybody will see order page
+
+```
+> touch src/pages/order.tsx
+```
+
+1. owner accept => client subscribe
+2. client order => owner subscribe
+3. driver subscribe cooked dish
+4. driver report address
+
+### Subscription setup(web socket)
+
+- setup transport
+
+```
+npm i subscriptions-transport-ws
+```
+
+- `wsLink` to backend with auth
+- `splitLink` ? true => wsLink : false => httpLink
+- client: authLink => use splitLink
+
+#### Subscription get the realtime changes
+
+```ts
+const { data: subsData } = useSubscription<orderUpdates, orderUpdatesVariables>(
+  ORDER_SUBSCRIPTION,
+  {
+    variables: {
+      input: {
+        id: +params.id,
+      },
+    },
+  }
+);
+```
+
+- use `subscribeToMore` for `useQuery + useSubscription`
+
+```ts
+  const { data, subscribeToMore } = useQuery<getOrder, getOrderVariables>(
+...
+useEffect(() => {
+    if (data?.getOrder.ok) {
+      subscribeToMore({
+        document: ORDER_SUBSCRIPTION,
+        variables: {
+          input: {
+            id: +params.id,
+          },
+        },
+        updateQuery: (
+          prev,
+          {
+            subscriptionData: { data },
+          }: { subscriptionData: { data: orderUpdates } } // typescript part
+        ) => {
+          if (!data) return prev; // if no changes, stop
+          return {
+            getOrder: {
+              ...prev.getOrder, // query's additional part
+              order: {
+                ...data.orderUpdates, // + subscription part
+              },
+            },
+          };
+        },
+      });
+    }
+  }, [data]);
+```

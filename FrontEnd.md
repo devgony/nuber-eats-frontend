@@ -1800,3 +1800,28 @@ npm i -D @types/googlemaps
 // tailwind.config.js
 purge: ["./src/**/*.tsx"],
 ```
+
+- look at production
+- Page not found error => redirect everything to index.html
+
+```
+// touch public/_redirects
+/*  /index.html 200
+```
+
+- Change url to real backend
+
+```ts
+const wsLink = new WebSocketLink({
+  uri:
+    process.env.NODE_ENV === "production"
+      ? "wss://devgony-nuber-eats-backend.herokuapp.com/graphql"
+      : `ws://localhost:4000/graphql`,
+...
+
+const httpLink = createHttpLink({
+  uri:
+    process.env.NODE_ENV === "production"
+      ? "https://devgony-nuber-eats-backend.herokuapp.com/graphql"
+      : "http://localhost:4000/graphql",
+```

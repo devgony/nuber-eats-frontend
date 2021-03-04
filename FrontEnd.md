@@ -1812,7 +1812,8 @@ purge: ["./src/**/*.tsx"],
 - Change url to real backend
 
 ```ts
-const wsLink = new WebSocketLink({
+// apollo.ts
+const wsLink = new WebSocketLink(
   uri:
     process.env.NODE_ENV === "production"
       ? "wss://devgony-nuber-eats-backend.herokuapp.com/graphql"

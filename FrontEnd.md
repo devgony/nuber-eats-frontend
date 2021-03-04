@@ -1708,3 +1708,83 @@ useEffect(() => {
     }
   }, [data]);
 ```
+
+### Owner subscribe
+
+- we need to know who are you => `useMe` => differenciate button
+- PENDING_ORDER_SUBSCRIPTION => `useEffect` => push to `orders/id`
+
+### Edit Order for owner
+
+- `Pending?` => instead of showing status, `Cooking?` => `Cooked?` => show Status again
+
+### Driver Dashboard
+
+```
+> mkdir src/pages/driver
+> touch src/pages/driver/dashboard.tsx
+npm i google-map-react
+npm i @types/google-map-react
+> create API KEY at https://console.cloud.google.com/marketplace/product/google/maps-backend.googleapis.com?q=search&referrer=search&project=long-temple-280903
+```
+
+- google map needs width and height, defaultZoom, defaultCenter
+
+```ts
+        style={{ width: window.innerWidth, height: "95vh" }}
+```
+
+- `onApiLoaded` => `map`: currentMap, `maps`: MapClass
+- GPS manupulate: Chrome console => ... => More tools => Sensors
+- prop error => make child component and put taxi icon
+- install types for googlemaps
+
+```ts
+npm i -D @types/googlemaps
+// tsdconfig.json
+...
+    "types": ["googlemaps"]
+...
+```
+
+- `maps` state? => don't need to set to state, google is already on the window. eg) `google.maps`
+
+#### Enable `Directions API`, `Geocoding API`
+
+- Geocoding: take address => return coordinates
+- Reverse Geocoding: coordinates => address
+- usually take first address
+
+#### Challenge: get geocode from edit-profile
+
+#### Route
+
+- directionsRenderer(map)
+- directionsService({origin, destination})
+
+#### Challenge
+
+- client put address when order
+- show path and client can accept/deny
+
+#### COOKED_ORDERS_SUBCRIPTION
+
+- If there is order is cooked => makeRoute
+- Accpect deliver => subscribe Driver id
+- Click Picked Up => Status: Picked Up
+- Click Order Delivered => Thank you for using Nuber Eats
+
+## Netlyfy
+
+- New site from Git => Deploy
+
+```
+// package.json
+    "prebuild": "npm run tailwind:build",
+```
+
+- skip warning
+
+```
+    "build": "CI=false react-scripts build",
+```

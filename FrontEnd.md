@@ -1788,3 +1788,15 @@ npm i -D @types/googlemaps
 ```
     "build": "CI=false react-scripts build",
 ```
+
+- tailwind purge redundant
+
+```
+// package.json
+    "tailwind:prodbuild": "NODE_ENV=production npm run tailwind:build",
+    "prebuild": "npm run tailwind:tailwind:prodbuild",
+    // in case of windows, use additaional cross-env
+
+// tailwind.config.js
+purge: ["./src/**/*.tsx"],
+```

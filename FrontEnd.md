@@ -724,7 +724,7 @@ input: {
 
 - Manually edit cache with `writeFragment` right after updating backend
 
-  => Fater performance
+  => Faster performance
 
 #### Refetch
 
